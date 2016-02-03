@@ -135,7 +135,7 @@ cn=$(($cl))
 mount -t auto -o ro,loop,noauto,noexec,nodev,noatime,offset=$off,umask=222 $imm $BASE_IMG >/dev/null 2>&1 && {
 yad  --width 600 \--title "ImgMount" --text "Image file mounted in '$BASE_IMG'"
 echo "Image file mounted in '$BASE_IMG'"
-
+}
 fi
 done
 done
