@@ -3,7 +3,7 @@
 # ImgMount - by Nanni Bassetti - digitfor@gmail.com - http://www.nannibassetti.com 
 # release: 1.0
 #
-# It mounts a DD/EWF image file or a block device 
+# It mounts a DD/EWF image file or a block device, it needs TSK and XMount 
 #
 
 check_cancel()
@@ -120,30 +120,35 @@ endsect=$(echo "$endsect0" | bc)
 endoff=$(($endsect * 512 | bc))
 	
   [[ ! -d $outputdir/$lineparts/ ]] && mkdir $outputdir/$lineparts/
-BASE_IMG=$outputdir/tmpdd/$lineparts            # mounting directory
-
-allocated=$outputdir/$lineparts/Allocated
-
-[[ ! -d  $allocated ]] && mkdir -p $allocated
+BASE_IMG=$outputdir/$lineparts            # mounting directory
 
 [[ ! -d $BASE_IMG ]] && mkdir -p $BASE_IMG
 
 off=$(( $so * 512 ))
-# allocated files
-cn=$(($cl))
 
-mount -t auto -o ro,loop,noauto,noexec,nodev,noatime,offset=$off,umask=222 $imm $BASE_IMG >/dev/null 2>&1 && {
+cn=$(($cl))
+ if [ "$(fsstat -o $so $imm | grep -i NTFS)" ] 
+	   then
+            NTFS_OPTS="show_sys_files,streams_interface=windows,allow_other"
+        mount -t auto -o ro,loop,offset=$off,$NTFS_OPTS,noauto,noexec,nodev,noatime,umask=222 $imm $BASE_IMG >/dev/null 2>&1 && {
 yad  --width 600 \--title "ImgMount" --text "Image file mounted in '$BASE_IMG'"
 echo "Image file mounted in '$BASE_IMG'"
 }
+        else 
+        mount -t auto -o ro,loop,noauto,noexec,nodev,noatime,offset=$off,umask=222 $imm $BASE_IMG >/dev/null 2>&1 && {
+yad  --width 600 \--title "ImgMount" --text "Image file mounted in '$BASE_IMG'"
+echo "Image file mounted in '$BASE_IMG'"
+}
+		fi
+
 fi
 done
 done
 rm $outputdir/parts_chosen.txt
 rm $outputdir/mmls.txt
-[[ "$ITYPE" = "ewf" ]] && umount $MNTPNT
-[[ -d $MNTPNT ]] && rm  -r $MNTPNT
-[[ -d $outputdir/tmpdd/ ]] && rm  -r $outputdir/tmpdd/
+#[[ "$ITYPE" = "ewf" ]] && umount $MNTPNT
+#[[ -d $MNTPNT ]] && rm  -r $MNTPNT
+
 if [ $? == 0 ]; then
 	yad  --width 600 \--title "ImgMount" --text "Operation succeeded!\n\nYour data are here  $outputdir"
 else
