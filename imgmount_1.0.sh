@@ -3,7 +3,7 @@
 # ImgMount - by Nanni Bassetti - digitfor@gmail.com - http://www.nannibassetti.com 
 # release: 1.0
 #
-# It mounts a DD/EWF image file or a block device, it needs TSK and XMount 
+# It mounts a DD/EWF image file or a block device, it needs TSK and XMount and YAD (Yet Another Dialog)
 #
 
 check_cancel()
